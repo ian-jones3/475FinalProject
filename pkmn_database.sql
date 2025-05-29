@@ -25,3 +25,18 @@ INSERT INTO `administrator` (`first_name`, `last_name`, `email`) VALUES
 ('Jim', 'Boberts', 'jim.boberts@yahoo.com'), -- remember to use single quotes for strings
 ('Bill', 'Roberts', 'bill.roberts@hotmail.com'),
 ('Tom', 'Hoberts', 'tom.hoberts@gmail.com');
+
+-- sets table
+DROP TABLE IF EXISTS 'sets';
+CREATE TABLE IF NOT EXISTS `sets` (
+    `set_id` INT NOT NULL AUTO_INCREMENT,
+    `set_name` VARCHAR(50) NOT NULL,
+    `release_date` DATE NOT NULL,
+    PRIMARY KEY(`set_id`)
+);
+
+INSERT INTO `sets` (`set_name`, `release_date`) VALUES
+('Base Set', '1999-01-09'),
+('Team Rocket', '2000-04-24'),
+('Jungle', '1999-06-16'),
+('Fossil', '1999-10-10');
