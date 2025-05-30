@@ -27,16 +27,62 @@ INSERT INTO `administrator` (`first_name`, `last_name`, `email`) VALUES
 ('Tom', 'Hoberts', 'tom.hoberts@gmail.com');
 
 -- sets table
-DROP TABLE IF EXISTS `sets`;
-CREATE TABLE IF NOT EXISTS `sets` (
+DROP TABLE IF EXISTS `set`;
+CREATE TABLE IF NOT EXISTS `set` (
     `set_id` INT NOT NULL AUTO_INCREMENT,
     `set_name` VARCHAR(50) NOT NULL,
     `release_date` DATE NOT NULL,
     PRIMARY KEY(`set_id`)
 );
 
-INSERT INTO `sets` (`set_name`, `release_date`) VALUES
+INSERT INTO `set` (`set_name`, `release_date`) VALUES
 ('Base Set', '1999-01-09'),
 ('Team Rocket', '2000-04-24'),
 ('Jungle', '1999-06-16'),
 ('Fossil', '1999-10-10');
+
+-- grading company table
+DROP TABLE IF EXISTS `grading_company`;
+CREATE TABLE IF NOT EXISTS `grading_company` (
+    `grading_company_id` INT NOT NULL AUTO_INCREMENT,
+    `company_name` VARCHAR(50) NOT NULL,
+    PRIMARY KEY(`grading_company_id`)
+);
+
+INSERT INTO `grading_company` (`company_name`) VALUES
+('PSA');
+
+-- vendor table
+DROP TABLE IF EXISTS `vendor`;
+CREATE TABLE IF NOT EXISTS `vendor` (
+    `user_id` INT NOT NULL AUTO_INCREMENT,
+    `first_name` VARCHAR(35) NOT NULL,
+    `last_name` VARCHAR(35) NOT NULL,
+    `email` VARCHAR(320) NOT NULL,
+    `booth_no` INT NOT NULL,
+    `checked_in` BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY(`user_id`)
+);
+
+INSERT INTO `vendor` (`first_name`, `last_name`, `email`, `booth_no`) VALUES
+('John', 'Example', 'email@emailaddress.com', '5');
+
+-- card table
+-- TODO: add image functionality (if possible/practical)
+DROP TABLE IF EXISTS `card`;
+CREATE TABLE IF NOT EXISTS `card` (
+    `listing_no` INT NOT NULL AUTO_INCREMENT,
+    `vendor_id` INT NOT NULL,
+    `grading_company_id` INT NOT NULL,
+    `card_name` VARCHAR(50) NOT NULL,
+    `grade` DECIMAL(3, 1) NOT NULL,
+    `quantity` INT NOT NULL,
+    `set_id` INT NOT NULL,
+    `price` DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY(`listing_no`)
+);
+
+INSERT INTO `card` (`vendor_id`, `grading_company_id`, `card_name`, `grade`, `quantity`, `set_id`, `price`) VALUES
+(1, 1, 'Charizard', 9.5, 10, 1, 100.00),
+(1, 1, 'Pikachu', 10.0, 5, 2, 50.00),
+(1, 1, 'Bulbasaur', 8.0, 20, 3, 25.00);
