@@ -27,7 +27,7 @@ INSERT INTO `administrator` (`first_name`, `last_name`, `email`) VALUES
 ('Tom', 'Hoberts', 'tom.hoberts@gmail.com');
 
 -- sets table
-DROP TABLE IF EXISTS 'sets';
+DROP TABLE IF EXISTS `sets`;
 CREATE TABLE IF NOT EXISTS `sets` (
     `set_id` INT NOT NULL AUTO_INCREMENT,
     `set_name` VARCHAR(50) NOT NULL,
