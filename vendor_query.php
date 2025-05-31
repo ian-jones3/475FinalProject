@@ -37,12 +37,10 @@ function executeVendorQuery($sortingMethod, $sortingDirection)
                 $first_name,
                 $last_name,
                 $email,
-                $booth_no,
-                $checked_in,
             );
             echo "<ul>";
             while ($stmt->fetch()) {
-                echo "<li>$first_name $last_name at booth number $booth_no</li>";
+                echo "<li>$first_name $last_name is at the event</li>";
             }
             echo "</ul>";
         }
