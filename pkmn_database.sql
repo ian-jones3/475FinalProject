@@ -6,12 +6,26 @@
 -- For reference on writing the SQL script,
 -- refer to point_of_sale.sql from the example.
 
+-- all tuples in this script are ai generated. While they are sound within 
+-- the constraints and logic of the database, they may not represent reality
+-- i.e incorrect info attached to card sets, wrong addresses, etc.
+-- This data is for demonstration purposes only
+
+DROP TABLE IF EXISTS `ticket`;
+DROP TABLE IF EXISTS `card`;
+DROP TABLE IF EXISTS `vendor`;
+DROP TABLE IF EXISTS `customer`;
+DROP TABLE IF EXISTS `event`;
+DROP TABLE IF EXISTS `grading_company`;
+DROP TABLE IF EXISTS `administrator`;
+DROP TABLE IF EXISTS `location`;
+DROP TABLE IF EXISTS `set`;
+
 -- Create and use database
 CREATE DATABASE IF NOT EXISTS `pkmn_database`; -- remember to use backticks for identifiers
 USE `pkmn_database`;
 
 -- drop existing and create administrator table
-DROP TABLE IF EXISTS `administrator`;
 CREATE TABLE IF NOT EXISTS `administrator` (
     `user_id` INT NOT NULL AUTO_INCREMENT,
     `first_name` VARCHAR(35) NOT NULL,
@@ -26,16 +40,15 @@ INSERT INTO `administrator` (`first_name`, `last_name`, `email`) VALUES
 ('Bill', 'Roberts', 'bill.roberts@hotmail.com'),
 ('Tom', 'Hoberts', 'tom.hoberts@gmail.com');
 
+
 -- locations table
-DROP TABLE IF EXISTS `location`;
 CREATE TABLE IF NOT EXISTS `location` (
     `location_id` INT NOT NULL AUTO_INCREMENT,
     `city` VARCHAR(50) NOT NULL,
     `address` VARCHAR(100) NOT NULL,
     `zip_code` CHAR(5) NOT NULL,
     `venue_name` VARCHAR(50) NOT NULL,
-    PRIMARY KEY(`location_id`),
-    CONSTRAINT `zip_len` CHECK (zip_code REGEXP '^[0-9]{5}$')
+    PRIMARY KEY(`location_id`)
 );
 
 INSERT INTO `location` (`city`, `address`, `zip_code`, `venue_name`) VALUES
@@ -45,8 +58,24 @@ INSERT INTO `location` (`city`, `address`, `zip_code`, `venue_name`) VALUES
 ('Chicago', '2301 S Lake Shore Drive', '60616', 'McCormick Place'),
 ('Boston', '415 Summer Street', '02210', 'Boston Convention Center');
 
+CREATE TABLE IF NOT EXISTS `event` (
+    `event_id` INT NOT NULL AUTO_INCREMENT,
+    `location_id` INT NOT NULL, -- CONSTRAINT: No 2 events at same location with overlapping time
+    `event_start_date` DATETIME NOT NULL,
+    `event_end_date` DATETIME NOT NULL,
+    PRIMARY KEY(`event_id`),
+    FOREIGN KEY(`location_id`) REFERENCES `location`(`location_id`)
+);
+
+INSERT INTO `event` (`location_id`, `event_start_date`, `event_end_date`) VALUES
+(1, '2024-01-15 09:00:00', '2024-01-17 18:00:00'),  -- Seattle 3-day convention
+(2, '2024-03-22 10:00:00', '2024-03-23 19:00:00'),  -- Las Vegas 2-day event
+(3, '2024-06-05 09:00:00', '2024-06-07 17:00:00'),  -- Orlando summer convention
+(4, '2024-09-10 08:00:00', '2024-09-12 18:00:00'),  -- Chicago fall showcase
+(5, '2024-11-30 10:00:00', '2024-12-01 17:00:00');  -- Boston winter event
+
+
 -- sets table
-DROP TABLE IF EXISTS `set`;
 CREATE TABLE IF NOT EXISTS `set` (
     `set_id` INT NOT NULL AUTO_INCREMENT,
     `set_name` VARCHAR(50) NOT NULL,
@@ -86,8 +115,46 @@ INSERT INTO `set` (`set_name`, `release_date`) VALUES
 ('EX Dragon Frontiers', '2006-11-08'),
 ('EX Power Keepers', '2007-02-02');
 
+-- customer table
+CREATE TABLE IF NOT EXISTS `customer` (
+    `user_id` INT NOT NULL AUTO_INCREMENT,
+    `last_managed_by` INT,
+    `first_name` VARCHAR(35) NOT NULL,
+    `last_name` VARCHAR(35) NOT NULL,
+    `email` VARCHAR(320) NOT NULL,
+    `phone` CHAR(10), -- be sure to strip all non-numeric chars from input.
+    PRIMARY KEY(`user_id`),
+    FOREIGN KEY(`last_managed_by`) REFERENCES `administrator`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+INSERT INTO `customer` (`first_name`, `last_name`, `email`, `phone`, `last_managed_by`) VALUES
+('James', 'Smith', 'james.smith@email.com', '2065551234', 1),
+('Maria', 'Garcia', 'maria.g@email.com', NULL, NULL),
+('Robert', 'Johnson', 'rob.johnson@email.com', '4255557890', 1),
+('Lisa', 'Brown', 'lisa.brown@email.com', NULL, NULL),
+('Michael', 'Davis', 'mdavis@email.com', NULL, 2),
+('Jennifer', 'Wilson', 'jwilson@email.com', '2065559876', NULL),
+('William', 'Taylor', 'wtaylor@email.com', NULL, 2),
+('Elizabeth', 'Anderson', 'eanderson@email.com', NULL, NULL),
+('David', 'Thomas', 'dthomas@email.com', NULL, 1),
+('Sarah', 'Moore', 'smoore@email.com', '2065554321', NULL),
+('Richard', 'Jackson', 'rjackson@email.com', NULL, 3),
+('Patricia', 'White', 'pwhite@email.com', NULL, NULL),
+('Joseph', 'Harris', 'jharris@email.com', '4255552345', 2),
+('Linda', 'Martin', 'lmartin@email.com', NULL, NULL),
+('Thomas', 'Thompson', 'tthompson@email.com', NULL, 1),
+('Jessica', 'Lee', 'jlee@email.com', NULL, NULL),
+('Charles', 'Clark', 'cclark@email.com', '2065557777', 3),
+('Margaret', 'Rodriguez', 'mrodriguez@email.com', NULL, NULL),
+('Christopher', 'Lewis', 'clewis@email.com', NULL, 2),
+('Sandra', 'Walker', 'swalker@email.com', '4255558888', NULL),
+('Daniel', 'Hall', 'dhall@email.com', NULL, 1),
+('Ashley', 'Allen', 'aallen@email.com', NULL, NULL),
+('Paul', 'Young', 'pyoung@email.com', '2065553333', 3),
+('Michelle', 'King', 'mking@email.com', NULL, NULL),
+('Kenneth', 'Wright', 'kwright@email.com', '4255559999', NULL);
+
 -- grading company table
-DROP TABLE IF EXISTS `grading_company`;
 CREATE TABLE IF NOT EXISTS `grading_company` (
     `grading_company_id` INT NOT NULL AUTO_INCREMENT,
     `company_name` VARCHAR(50) NOT NULL,
@@ -102,48 +169,45 @@ INSERT INTO `grading_company` (`company_name`) VALUES
 -- vendor table
 -- TODO: add constraint to enforce unique booth_no if feasible
 -- mind that duplicates across diff events isn't a problem
-DROP TABLE IF EXISTS `vendor`;
 CREATE TABLE IF NOT EXISTS `vendor` (
     `user_id` INT NOT NULL AUTO_INCREMENT,
     `last_managed_by` INT,
     `first_name` VARCHAR(35) NOT NULL,
     `last_name` VARCHAR(35) NOT NULL,
     `email` VARCHAR(320) NOT NULL,
-    `booth_no` INT NOT NULL,
+    `phone` CHAR(10), -- be sure to strip all non-numeric chars from input.
     PRIMARY KEY(`user_id`),
     -- auto update if admin user id is changed, auto delete if admin is deleted
     FOREIGN KEY(`last_managed_by`) REFERENCES `administrator`(`user_id`) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
-INSERT INTO `vendor` (`first_name`, `last_name`, `email`, `booth_no`) VALUES
-('John', 'Example', 'email@emailaddress.com', '5'),
-('Bill', 'WhoIsThis', 'bill@gmail.com', '9'),
-('Tim', 'Brown', 'address@hotmail.com', '7'),
-('Alice', 'Smith', 'alice.smith@example.com', '10'),
-('Bob', 'Johnson', 'bob.johnson@example.com', '15'),
-('Charlie', 'Williams', 'charlie.williams@example.com', '20'),
-('Diana', 'Jones', 'diana.jones@example.com', '25'),
-('Eve', 'Taylor', 'eve.taylor@example.com', '30'),
-('Frank', 'Anderson', 'frank.anderson@example.com', '35'),
-('Grace', 'Thomas', 'grace.thomas@example.com', '40'),
-('Hank', 'Moore', 'hank.moore@example.com', '45'),
-('Ivy', 'Martin', 'ivy.martin@example.com', '52'),
-('Jack', 'Lee', 'jack.lee@example.com', '55'),
-('Karen', 'Perez', 'karen.perez@example.com', '60'),
-('Leo', 'Clark', 'leo.clark@example.com', '65'),
-('Mia', 'Lewis', 'mia.lewis@example.com', '73'),
-('Nina', 'Walker', 'nina.walker@example.com', '75'),
-('Oscar', 'Hall', 'oscar.hall@example.com', '80'),
-('Paul', 'Allen', 'paul.allen@example.com', '85'),
-('Quinn', 'Young', 'quinn.young@example.com', '90'),
-('Rachel', 'King', 'rachel.king@example.com', '98'),
-('Steve', 'Scott', 'steve.scott@example.com', '100'),
-('Tina', 'Green', 'tina.green@example.com', '105');
-
+INSERT INTO `vendor` (`first_name`, `last_name`, `email`) VALUES
+('John', 'Example', 'email@emailaddress.com'),
+('Bill', 'WhoIsThis', 'bill@gmail.com'),
+('Tim', 'Brown', 'address@hotmail.com'),
+('Alice', 'Smith', 'alice.smith@example.com'),
+('Bob', 'Johnson', 'bob.johnson@example.com'),
+('Charlie', 'Williams', 'charlie.williams@example.com'),
+('Diana', 'Jones', 'diana.jones@example.com'),
+('Eve', 'Taylor', 'eve.taylor@example.com'),
+('Frank', 'Anderson', 'frank.anderson@example.com'),
+('Grace', 'Thomas', 'grace.thomas@example.com'),
+('Hank', 'Moore', 'hank.moore@example.com'),
+('Ivy', 'Martin', 'ivy.martin@example.com'),
+('Jack', 'Lee', 'jack.lee@example.com'),
+('Karen', 'Perez', 'karen.perez@example.com'),
+('Leo', 'Clark', 'leo.clark@example.com'),
+('Mia', 'Lewis', 'mia.lewis@example.com'),
+('Nina', 'Walker', 'nina.walker@example.com'),
+('Oscar', 'Hall', 'oscar.hall@example.com'),
+('Paul', 'Allen', 'paul.allen@example.com'),
+('Quinn', 'Young', 'quinn.young@example.com'),
+('Rachel', 'King', 'rachel.king@example.com'),
+('Steve', 'Scott', 'steve.scott@example.com'),
+('Tina', 'Green', 'tina.green@example.com');
 
 -- card table
 -- TODO: add image functionality (if possible/practical)
-DROP TABLE IF EXISTS `card`;
 CREATE TABLE IF NOT EXISTS `card` (
     `listing_no` INT NOT NULL AUTO_INCREMENT,
     `vendor_id` INT NOT NULL,
@@ -238,3 +302,97 @@ INSERT INTO `card` (`vendor_id`, `grading_company_id`, `card_name`, `grade`, `qu
 (15, 1, 'Mewtwo', 9.0, 9, 16, 30.00),
 (16, 2, 'Mew', 8.7, 11, 17, 20.00),
 (16, 3, 'Charizard', 9.3, 13, 18, 40.00);
+
+CREATE TABLE IF NOT EXISTS `ticket` (
+    `ticket_id` INT NOT NULL AUTO_INCREMENT,
+    `customer_id` INT,
+    `vendor_id` INT,
+    `event_id` INT NOT NULL,
+    `date_of_purchase` DATE NOT NULL,
+    `ticket_type` CHAR(1) NOT NULL, 
+    `checked_in` BOOLEAN NOT NULL DEFAULT 0,
+    `booth_no` INT, 
+    PRIMARY KEY(`ticket_id`),
+    FOREIGN KEY(`vendor_id`) REFERENCES `vendor`(`user_id`),
+    FOREIGN KEY(`customer_id`) REFERENCES `customer`(`user_id`),
+    FOREIGN KEY(`event_id`) REFERENCES `event`(`event_id`),
+    CONSTRAINT one_user_id CHECK ( -- ensure exactly one user id is attached to this ticket
+        (vendor_id IS NULL AND customer_id IS NOT NULL) OR 
+        (vendor_id IS NOT NULL AND customer_id IS NULL)  
+    ),
+    -- CONSTRAINT; EITHER 'v' or 'c'
+    CONSTRAINT valid_ticket_type CHECK ((ticket_type = 'v') OR (ticket_type = 'c')),
+    --  CONSTRAINT: IF TICKET TYPE = V, CAN'T BE NULL, IF C, MUST BE NULL
+    CONSTRAINT valid_booth_no CHECK (
+        (ticket_type = 'v' AND booth_no != NULL) OR
+        (ticket_type = 'c' AND booth_no = NULL)
+    ),
+    -- for a given event_id, not repeat booth #
+    CONSTRAINT no_dup_booth_no UNIQUE(event_id, booth_no), 
+    -- CONSTRAINT: CANT PURCHASE AFTER EVENT DATE
+    CONSTRAINT valid_purchase_date CHECK (date_of_purchase < (
+        SELECT event_end_date FROM event WHERE event.event_id = ticket.event_id
+        )
+    )
+);
+
+INSERT INTO `ticket` (`customer_id`, `vendor_id`, `event_id`, `date_of_purchase`, `ticket_type`, `checked_in`, `booth_no` ) VALUES
+-- Event 1 (Seattle, Jan 15-17, 2024)
+(1, NULL, 1, '2023-11-15', 'c', 0, NULL),
+(2, NULL, 1, '2023-12-01', 'c', 0, NULL),
+(3, NULL, 1, '2023-12-15', 'c', 0, NULL),
+(4, NULL, 1, '2024-01-01', 'c', 0, NULL),
+(5, NULL, 1, '2024-01-10', 'c', 0, NULL),
+(NULL, 1, 1, '2023-10-01', 'v', 0, 101),
+(NULL, 2, 1, '2023-10-01', 'v', 0, 102),
+(NULL, 3, 1, '2023-10-01', 'v', 0, 103),
+(NULL, 4, 1, '2023-10-02', 'v', 0, 104),
+(NULL, 5, 1, '2023-10-02', 'v', 0, 105),
+
+-- Event 2 (Las Vegas, Mar 22-23, 2024)
+(6, NULL, 2, '2024-01-15', 'c', 0, NULL),
+(7, NULL, 2, '2024-02-01', 'c', 0, NULL),
+(8, NULL, 2, '2024-02-15', 'c', 0, NULL),
+(9, NULL, 2, '2024-03-01', 'c', 0, NULL),
+(10, NULL, 2, '2024-03-10', 'c', 0, NULL),
+(NULL, 6, 2, '2024-01-02', 'v', 0, 201),
+(NULL, 7, 2, '2024-01-02', 'v', 0, 202),
+(NULL, 8, 2, '2024-01-03', 'v', 0, 203),
+(NULL, 9, 2, '2024-01-03', 'v', 0, 204),
+(NULL, 10, 2, '2024-01-04', 'v', 0, 205),
+
+-- Event 3 (Orlando, Jun 5-7, 2024)
+(11, NULL, 3, '2024-03-01', 'c', 0, NULL),
+(12, NULL, 3, '2024-03-15', 'c', 0, NULL),
+(13, NULL, 3, '2024-04-01', 'c', 0, NULL),
+(14, NULL, 3, '2024-04-15', 'c', 0, NULL),
+(15, NULL, 3, '2024-05-01', 'c', 0, NULL),
+(NULL, 11, 3, '2024-02-01', 'v', 0, 301),
+(NULL, 12, 3, '2024-02-01', 'v', 0, 302),
+(NULL, 13, 3, '2024-02-02', 'v', 0, 303),
+(NULL, 14, 3, '2024-02-02', 'v', 0, 304),
+(NULL, 15, 3, '2024-02-03', 'v', 0, 305),
+
+-- Event 4 (Chicago, Sep 10-12, 2024)
+(16, NULL, 4, '2024-06-01', 'c', 0, NULL),
+(17, NULL, 4, '2024-06-15', 'c', 0, NULL),
+(18, NULL, 4, '2024-07-01', 'c', 0, NULL),
+(19, NULL, 4, '2024-07-15', 'c', 0, NULL),
+(20, NULL, 4, '2024-08-01', 'c', 0, NULL),
+(NULL, 16, 4, '2024-05-01', 'v', 0, 401),
+(NULL, 17, 4, '2024-05-01', 'v', 0, 402),
+(NULL, 18, 4, '2024-05-02', 'v', 0, 403),
+(NULL, 19, 4, '2024-05-02', 'v', 0, 404),
+(NULL, 20, 4, '2024-05-03', 'v', 0, 405),
+
+-- Event 5 (Boston, Nov 30-Dec 1, 2024)
+(21, NULL, 5, '2024-09-01', 'c', 0, NULL),
+(22, NULL, 5, '2024-09-15', 'c', 0, NULL),
+(23, NULL, 5, '2024-10-01', 'c', 0, NULL),
+(24, NULL, 5, '2024-10-15', 'c', 0, NULL),
+(25, NULL, 5, '2024-11-01', 'c', 0, NULL),
+(NULL, 21, 5, '2024-08-01', 'v', 0, 501),
+(NULL, 22, 5, '2024-08-01', 'v', 0, 502),
+(NULL, 23, 5, '2024-08-02', 'v', 0, 503),
+(NULL, 1, 5, '2024-08-02', 'v', 0, 504),  -- Some vendors attending multiple events
+(NULL, 2, 5, '2024-08-03', 'v', 0, 505);
