@@ -53,6 +53,8 @@ INSERT INTO `grading_company` (`company_name`) VALUES
 ('PSA');
 
 -- vendor table
+-- TODO: add constraint to enforce unique booth_no if feasible
+-- mind that duplicates across diff events isn't a problem
 DROP TABLE IF EXISTS `vendor`;
 CREATE TABLE IF NOT EXISTS `vendor` (
     `user_id` INT NOT NULL AUTO_INCREMENT,
@@ -65,7 +67,10 @@ CREATE TABLE IF NOT EXISTS `vendor` (
 );
 
 INSERT INTO `vendor` (`first_name`, `last_name`, `email`, `booth_no`) VALUES
-('John', 'Example', 'email@emailaddress.com', '5');
+('John', 'Example', 'email@emailaddress.com', '5'),
+('Bill', 'WhoIsThis', 'bill@gmail.com', '9'),
+('tim', 'brown', 'address@hotmail.com', '7');
+
 
 -- card table
 -- TODO: add image functionality (if possible/practical)

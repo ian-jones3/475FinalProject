@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cardSortingMethod = $_POST['sortMethod'];
     $cardSortingDirection = $_POST['sortDirection'];
     ob_start(); // store output of query execution
+    echo "<div>Sorting by $cardSortingMethod in $cardSortingDirection order</div>";
     executeCardQuery($cardSortingMethod, $cardSortingDirection);
     $cardQueryResults = ob_get_clean();
 }
@@ -23,7 +24,6 @@ function executeCardQuery($cardSortingMethod, $cardSortingDirection)
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     } else {
-        echo 'Connection successful!';
         //echo "SELECT * FROM card ORDER BY $cardSortingMethod $cardSortingDirection";
         $sql = "SELECT * FROM card ORDER BY $cardSortingMethod $cardSortingDirection";
         //$sql = "SELECT * FROM card";
@@ -35,15 +35,16 @@ function executeCardQuery($cardSortingMethod, $cardSortingDirection)
             $stmt->execute();
 
             // Loop Through Result
-            $stmt->bind_result($listing_no, 
-            $vendor_id, 
-            $grading_company_id, 
-            $card_name, 
-            $grade,
-            $card_quantity,
-            $set_id,
-            $price,
-        );
+            $stmt->bind_result(
+                $listing_no,
+                $vendor_id,
+                $grading_company_id,
+                $card_name,
+                $grade,
+                $card_quantity,
+                $set_id,
+                $price,
+            );
             echo "<ul>";
             while ($stmt->fetch()) {
                 echo "<li>$card_name price is $price</li>";
