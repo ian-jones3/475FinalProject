@@ -11,6 +11,10 @@
 -- i.e incorrect info attached to card sets, wrong addresses, etc.
 -- This data is for demonstration purposes only
 
+-- Create and use database
+CREATE DATABASE IF NOT EXISTS `pkmn_database`; -- remember to use backticks for identifiers
+USE `pkmn_database`;
+
 DROP TABLE IF EXISTS `ticket`;
 DROP TABLE IF EXISTS `card`;
 DROP TABLE IF EXISTS `vendor`;
@@ -20,10 +24,6 @@ DROP TABLE IF EXISTS `grading_company`;
 DROP TABLE IF EXISTS `administrator`;
 DROP TABLE IF EXISTS `location`;
 DROP TABLE IF EXISTS `set`;
-
--- Create and use database
-CREATE DATABASE IF NOT EXISTS `pkmn_database`; -- remember to use backticks for identifiers
-USE `pkmn_database`;
 
 -- drop existing and create administrator table
 CREATE TABLE IF NOT EXISTS `administrator` (
