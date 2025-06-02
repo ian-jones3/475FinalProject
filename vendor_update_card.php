@@ -57,6 +57,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->execute();
         $stmt->close();
     }
+
+    if (isset($_POST['insert_card'])) {
+        $vendor_id = intval($_POST['vendor_id']);
+        $card_name = trim($_POST['card_name']);
+        $grade = floatval($_POST['grade']);
+        $grading_company_id = intval($_POST['grading_company_id']);
+        $quantity = intval($_POST['quantity']);
+        $set_id = intval($_POST['set_id']);
+        $price = floatval($_POST['price']);
+
+        $stmt = $conn->prepare("INSERT INTO card (vendor_id, grading_company_id, card_name, grade, quantity, set_id, price) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt) {
+            $stmt->bind_param("iisdiid", $vendor_id, $grading_company_id, $card_name, $grade, $quantity, $set_id, $price);
+            if ($stmt->execute()) {
+                echo "<p style='color:green;'>Card inserted successfully.</p>";
+            } else {
+                echo "<p style='color:red;'>Insert failed: " . htmlspecialchars($stmt->error) . "</p>";
+            }
+            $stmt->close();
+        } else {
+            echo "<p style='color:red;'>Prepare failed: " . htmlspecialchars($conn->error) . "</p>";
+        }
+    }
 }
 
 // Load cards if vendor_id is found
@@ -78,6 +101,20 @@ if ($vendor_id !== null) {
     $stmt->close();
 }
 
+$grading_companies = [];
+$result = $conn->query("SELECT grading_company_id, company_name FROM grading_company");
+while ($row = $result->fetch_assoc()) {
+    $grading_companies[] = $row;
+}
+$result->close();
+
+$sets = [];
+$result = $conn->query("SELECT set_id, set_name FROM `set`");
+while ($row = $result->fetch_assoc()) {
+    $sets[] = $row;
+}
+$result->close();
+
 $conn->close();
 ?>
 
@@ -88,6 +125,7 @@ $conn->close();
 </head>
 <body>
     <h2>Manage Vendor Inventory</h2>
+
     <form method="POST">
         <label for="vendor_name">Enter Vendor Name (First Last):</label>
         <input type="text" id="vendor_name" name="vendor_name" required value="<?= htmlspecialchars($vendor_name_input) ?>">
@@ -140,8 +178,40 @@ $conn->close();
             <p>This vendor has no cards listed.</p>
         <?php endif; ?>
 
+        <h3>Insert New Card</h3>
+        <form method="POST">
+            <input type="hidden" name="vendor_id" value="<?= $vendor_id ?>">
+
+            <label>Card Name: <input type="text" name="card_name" required></label><br><br>
+
+            <label>Grade (e.g. 9.5): <input type="number" name="grade" step="0.1" min="1" max="10" required></label><br><br>
+
+            <label>Grading Company:
+                <select name="grading_company_id" required>
+                    <?php foreach ($grading_companies as $gc): ?>
+                        <option value="<?= $gc['grading_company_id'] ?>"><?= htmlspecialchars($gc['company_name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label><br><br>
+
+            <label>Quantity: <input type="number" name="quantity" min="1" required></label><br><br>
+
+            <label>Set:
+                <select name="set_id" required>
+                    <?php foreach ($sets as $set): ?>
+                        <option value="<?= $set['set_id'] ?>"><?= htmlspecialchars($set['set_name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label><br><br>
+
+            <label>Price: $<input type="number" name="price" step="0.01" min="0" required></label><br><br>
+
+            <button type="submit" name="insert_card">Insert Card</button>
+        </form>
+
     <?php elseif ($_SERVER["REQUEST_METHOD"] === "POST"): ?>
         <p><strong>No vendor found with that name.</strong></p>
     <?php endif; ?>
+
 </body>
 </html>
