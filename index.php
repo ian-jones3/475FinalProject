@@ -3,10 +3,10 @@ require_once 'header.inc.php';
 ?>
 <div>
     <h2>Please select the type of user you are:</h2>
-    <a href="user_view.php">
-        <button>User</button>
+    <a href="user_form.php">
+        <button>Default User</button>
     </a>
-        <a href="vendor_view.php">
+        <a href="vendor_update_card.php">
     <button>Vendor</button>
     </a>
     <a href="administrator_view.php">
