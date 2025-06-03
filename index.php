@@ -9,7 +9,7 @@ require_once 'header.inc.php';
         <a href="vendor_update_card.php">
     <button>Vendor</button>
     </a>
-    <a href="administrator_view.php">
+    <a href="admin_update.php">
         <button>Administrator</button>
     </a>
 </div>
