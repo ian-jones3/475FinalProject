@@ -13,11 +13,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $first_name = trim($_POST["first_name"]);
         $last_name = trim($_POST["last_name"]);
         $email = trim($_POST["email"]);
-        $booth_no = intval($_POST["booth_no"]);
         $last_managed_by = !empty($_POST["last_managed_by"]) ? intval($_POST["last_managed_by"]) : null;
 
-        $stmt = $conn->prepare("INSERT INTO vendor (first_name, last_name, email, booth_no, last_managed_by) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssii", $first_name, $last_name, $email, $booth_no, $last_managed_by);
+        $stmt = $conn->prepare("INSERT INTO vendor (first_name, last_name, email, last_managed_by) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("sssi", $first_name, $last_name, $email, $last_managed_by);
         if ($stmt->execute()) {
             echo "<p style='color:green;'>Vendor inserted successfully.</p>";
         } else {
@@ -32,10 +31,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $first_name = trim($_POST["first_name"]);
         $last_name = trim($_POST["last_name"]);
         $email = trim($_POST["email"]);
-        $booth_no = intval($_POST["booth_no"]);
 
-        $stmt = $conn->prepare("UPDATE vendor SET first_name = ?, last_name = ?, email = ?, booth_no = ? WHERE user_id = ?");
-        $stmt->bind_param("sssii", $first_name, $last_name, $email, $booth_no, $vendor_id);
+        $stmt = $conn->prepare("UPDATE vendor SET first_name = ?, last_name = ?, email = ? WHERE user_id = ?");
+        $stmt->bind_param("sssi", $first_name, $last_name, $email, $vendor_id);
         $stmt->execute();
         $stmt->close();
     }
@@ -75,10 +73,8 @@ $conn->close();
         <input type="text" name="last_name" required>
         <label>Email:</label>
         <input type="email" name="email" required>
-        <label>Booth No:</label>
-        <input type="number" name="booth_no" required>
-        <label>Checked in By (Admin ID):</label>
-        <input type="number" name="checked_in_by">
+        <label>Last managed by (Admin ID):</label>
+        <input type="number" name="last_managed_by">
         <button type="submit" name="insert_vendor">Insert</button>
     </form>
 
@@ -90,7 +86,6 @@ $conn->close();
             <th>First</th>
             <th>Last</th>
             <th>Email</th>
-            <th>Booth</th>
             <th>Last Managed By</th>
             <th>Actions</th>
         </tr>
@@ -101,8 +96,7 @@ $conn->close();
                 <td><input type="text" name="first_name" value="<?= htmlspecialchars($vendor["first_name"]) ?>" required></td>
                 <td><input type="text" name="last_name" value="<?= htmlspecialchars($vendor["last_name"]) ?>" required></td>
                 <td><input type="email" name="email" value="<?= htmlspecialchars($vendor["email"]) ?>" required></td>
-                <td><input type="number" name="booth_no" value="<?= htmlspecialchars($vendor["booth_no"]) ?>" required></td>
-                <td><?= htmlspecialchars($vendor["checked_in_by"]) ?></td>
+                <td><?= htmlspecialchars($vendor["last_managaed_by"]) ?></td>
                 <td>
                     <input type="hidden" name="vendor_id" value="<?= $vendor["user_id"] ?>">
                     <button type="submit" name="update_vendor">Update</button>
