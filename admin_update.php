@@ -105,6 +105,7 @@ $conn->close();
                 <td><?= htmlspecialchars($vendor["checked_in_by"]) ?></td>
                 <td>
                     <input type="hidden" name="vendor_id" value="<?= $vendor["user_id"] ?>">
+                    <button type="submit" name="update_vendor">Update</button>
                     <button type="submit" name="delete_vendor" onclick="return confirm('Delete this vendor?');">Delete</button>
                 </td>
             </form>
