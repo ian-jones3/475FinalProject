@@ -12,7 +12,7 @@ if ($conn->connect_error) {
 
 // SQL query
 $sql = "
-SELECT AVG(c.price)
+SELECT AVG(c.price) AS avg_price
 FROM card c
 JOIN `set` s on c.set_id = s.set_id
 WHERE c.card_name = 'Charizard'
