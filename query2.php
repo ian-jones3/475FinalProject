@@ -37,14 +37,12 @@ $result = $conn->query($sql);
 if ($result && $result->num_rows > 0) {
     echo "<table border='1'><thead><tr>";
 
-    // Print table headers dynamically
     $fields = $result->fetch_fields();
     foreach ($fields as $field) {
         echo "<th>" . htmlspecialchars($field->name) . "</th>";
     }
     echo "</tr></thead><tbody>";
 
-    // Reset result pointer and print rows
     $result->data_seek(0);
     while ($row = $result->fetch_assoc()) {
         echo "<tr>";

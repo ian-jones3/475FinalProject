@@ -12,10 +12,10 @@ if ($conn->connect_error) {
 
 // SQL query
 $sql = "
-SELECT c.name, COUNT(*) AS listing_count
+SELECT c.card_name, COUNT(*) as listing_count
 FROM card c
-GROUP BY c.name
-ORDER BY listing_count DESC
+GROUP BY c.card_name
+ORDER BY listing_count DESC;
 ";
 
 $result = $conn->query($sql);
