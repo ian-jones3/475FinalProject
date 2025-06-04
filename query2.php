@@ -3,7 +3,6 @@ require_once 'config.inc.php';
 require_once 'header.inc.php';
 
 $conn = new mysqli($servername, $username, $password, $database, $port);
-
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -15,7 +14,7 @@ SELECT
     c.grade,
     c.price,
     v.first_name,
-    v.last_name,
+    v.last_name
 FROM card c
 JOIN vendor v ON c.vendor_id = v.user_id
 WHERE v.first_name = 'John'
