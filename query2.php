@@ -16,8 +16,6 @@ SELECT
     c.price,
     v.first_name,
     v.last_name,
-    v.phone,
-    v.last_managed_by
 FROM card c
 JOIN vendor v ON c.vendor_id = v.user_id
 WHERE v.first_name = 'John'
