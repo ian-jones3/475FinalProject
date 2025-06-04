@@ -1,16 +1,13 @@
 <?php
-require_once 'config.inc.php'; // assumes your DB settings are here
-require_once 'header.inc.php'; // optional header layout
+require_once 'config.inc.php';
+require_once 'header.inc.php';
 
-// Create DB connection
 $conn = new mysqli($servername, $username, $password, $database, $port);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// SQL query
 $sql = "
 SELECT 
     c.listing_no,
@@ -19,7 +16,7 @@ SELECT
     c.price,
     v.first_name,
     v.last_name,
-    v.phone_number,
+    v.phone,
     v.last_managed_by
 FROM card c
 JOIN vendor v ON c.vendor_id = v.user_id
@@ -45,13 +42,18 @@ $result = $conn->query($sql);
 if ($result && $result->num_rows > 0) {
     echo "<table border='1'><thead><tr>";
 
-    $fields = $result->fetch_fields();
-    foreach ($fields as $field) {
-        echo "<th>" . htmlspecialchars($field->name) . "</th>";
+    $row = $result->fetch_assoc();
+    foreach (array_keys($row) as $field) {
+        echo "<th>" . htmlspecialchars($field) . "</th>";
     }
     echo "</tr></thead><tbody>";
 
-    $result->data_seek(0);
+    echo "<tr>";
+    foreach ($row as $value) {
+        echo "<td>" . htmlspecialchars($value) . "</td>";
+    }
+    echo "</tr>";
+
     while ($row = $result->fetch_assoc()) {
         echo "<tr>";
         foreach ($row as $value) {
