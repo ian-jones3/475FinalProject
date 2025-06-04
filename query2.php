@@ -12,12 +12,20 @@ if ($conn->connect_error) {
 
 // SQL query
 $sql = "
-SELECT * 
+SELECT 
+    c.listing_no,
+    c.card_name,
+    c.grade,
+    c.price,
+    v.first_name,
+    v.last_name,
+    v.phone_number,
+    v.last_managed_by
 FROM card c
 JOIN vendor v ON c.vendor_id = v.user_id
 WHERE v.first_name = 'John'
-AND v.last_name = 'Example'
-ORDER BY c.card_name ASC
+  AND v.last_name = 'Example'
+ORDER BY c.card_name ASC;
 ";
 
 $result = $conn->query($sql);
