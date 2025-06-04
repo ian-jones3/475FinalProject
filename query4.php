@@ -1,25 +1,34 @@
 <?php
-require_once 'config.inc.php'; // assumes your DB settings are here
-require_once 'header.inc.php'; // optional header layout
+require_once 'config.inc.php';
+require_once 'header.inc.php';
 
-// Create DB connection
 $conn = new mysqli($servername, $username, $password, $database, $port);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
 // SQL query
 $sql = "
-SELECT * 
+SELECT 
+    c.listing_no,
+    c.vendor_id,
+    c.card_name,
+    c.grade,
+    c.quantity,
+    c.price,
+    g.grading_company_id AS g_company_id,
+    g.company_name AS grading_company_name,
+    s.set_id AS s_set_id,
+    s.set_name,
+    s.release_date
 FROM card c
 JOIN grading_company g ON c.grading_company_id = g.grading_company_id
 JOIN `set` s ON c.set_id = s.set_id
 WHERE c.grade >= 9.0
-AND g.company_name = 'CGC'
-AND s.set_name = 'Team Rocket'
-ORDER BY c.grade DESC
+  AND g.company_name = 'CGC'
+  AND s.set_name = 'Team Rocket'
+ORDER BY c.grade DESC;
 ";
 
 $result = $conn->query($sql);
@@ -33,7 +42,7 @@ $result = $conn->query($sql);
 <body>
 
 <h2>Query 4</h2>
-<h3>Show all card listings of CGC grade 9.0 or higher that are part of the Team Rocket card set,  sorted from highest grade to lowest.</h3>
+<h3>Show all card listings of CGC grade 9.0 or higher that are part of the Team Rocket card set, sorted from highest grade to lowest.</h3>
 
 <?php
 if ($result && $result->num_rows > 0) {

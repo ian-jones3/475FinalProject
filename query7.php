@@ -39,20 +39,22 @@ $result = $conn->query($sql);
 <?php
 if ($result && $result->num_rows > 0) {
     echo "<table border='1'><thead><tr>
-            <th>Vendor Name</th>
-            <th>Total PSA Cards (Grade ≥ 9.0)</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Total Cards</th>
         </tr></thead><tbody>";
 
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
-                <td>" . htmlspecialchars($row['name']) . "</td>
+                <td>" . htmlspecialchars($row['first_name']) . "</td>
+                <td>" . htmlspecialchars($row['last_name']) . "</td>
                 <td>" . htmlspecialchars($row['total_cards']) . "</td>
               </tr>";
     }
 
     echo "</tbody></table>";
 } else {
-    echo "<p>No vendors found with more than 5 PSA graded cards (Grade ≥ 9.0).</p>";
+    echo "<p>No vendors meet the criteria.</p>";
 }
 
 $conn->close();

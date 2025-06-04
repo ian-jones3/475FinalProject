@@ -40,7 +40,7 @@ if ($result && $result->num_rows > 0) {
 
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
-                <td>" . htmlspecialchars($row['name']) . "</td>
+                <td>" . htmlspecialchars($row['card_name']) . "</td>
                 <td>" . htmlspecialchars($row['listing_count']) . "</td>
               </tr>";
     }

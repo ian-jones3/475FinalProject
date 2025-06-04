@@ -34,7 +34,8 @@ $result = $conn->query($sql);
 
 <?php
 if ($result && $row = $result->fetch_assoc()) {
-    echo "<p>Average Price: $" . number_format($row['avg_price'], 2) . "</p>";
+    $avg = number_format((float)$row['avg_price'], 2);
+    echo "<p>The average price of <strong>Charizard</strong> from the <strong>Base Set</strong> is: <strong>\${$avg}</strong></p>";
 } else {
     echo "<p>No data found.</p>";
 }
