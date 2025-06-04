@@ -1,32 +1,26 @@
 <?php
-require_once 'config.inc.php'; // assumes your DB settings are here
+require_once 'config.inc.php'; // DB settings
 require_once 'header.inc.php'; // optional header layout
 
-// Create DB connection
 $conn = new mysqli($servername, $username, $password, $database, $port);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// SQL query
 $sql = "
 SELECT 
     v.first_name, 
     v.last_name, 
-    t.booth_no
+    v.email, 
+    t.booth_no, 
+    COUNT(DISTINCT c.listing_no) AS abnormal_listing_count
 FROM vendor v
+JOIN card c ON v.user_id = c.vendor_id
 JOIN ticket t ON v.user_id = t.vendor_id
-JOIN card c ON c.vendor_id = v.user_id
-JOIN event e ON t.event_id = e.event_id
-JOIN location l ON e.location_id = l.location_id
-JOIN `set` s ON c.set_id = s.set_id
-WHERE 
-    l.venue_name = 'Washington State Convention Center'
-    AND e.event_start_date = '2024-01-15 09:00:00'
-    AND s.set_name = 'Base Set'
-    AND c.card_name = 'Charizard'
+WHERE c.quantity >= 15
+GROUP BY v.user_id, v.first_name, v.last_name, v.email, t.booth_no
+ORDER BY abnormal_listing_count DESC
 ";
 
 $result = $conn->query($sql);
@@ -35,32 +29,35 @@ $result = $conn->query($sql);
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vendor Query Results</title>
+    <title>Vendors with Abnormal Listings</title>
 </head>
 <body>
 
-<h2>Query 1</h2>
-<h3>What vendors are selling the Base set Charizard at the Seattle Card Convention that is on January 15th, 2024?</h3>
+<h2>Query 9</h2>
+<h3>Show the name, email, and booth number of all vendors who have an abnormally large number of the same card (quantity >= 15). Also show the count of abnormal listings for each of these vendors, sorted from greatest to least.</h3>
 
 <?php
 if ($result && $result->num_rows > 0) {
-    echo "<table><thead><tr>
+    echo "<table border='1'><thead><tr>
             <th>First Name</th>
             <th>Last Name</th>
+            <th>Email</th>
             <th>Booth #</th>
+            <th>Abnormal Listing Count</th>
         </tr></thead><tbody>";
 
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
                 <td>" . htmlspecialchars($row['first_name']) . "</td>
                 <td>" . htmlspecialchars($row['last_name']) . "</td>
+                <td>" . htmlspecialchars($row['email']) . "</td>
                 <td>" . htmlspecialchars($row['booth_no']) . "</td>
+                <td>" . htmlspecialchars($row['abnormal_listing_count']) . "</td>
               </tr>";
     }
-
     echo "</tbody></table>";
 } else {
-    echo "<p>No vendors match the criteria.</p>";
+    echo "<p>No vendors with abnormal listings found.</p>";
 }
 
 $conn->close();
