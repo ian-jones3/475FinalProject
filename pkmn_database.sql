@@ -313,7 +313,7 @@ CREATE TABLE IF NOT EXISTS `ticket` (
     `checked_in` BOOLEAN NOT NULL DEFAULT 0,
     `booth_no` INT, 
     PRIMARY KEY(`ticket_id`),
-    FOREIGN KEY(`vendor_id`) REFERENCES `vendor`(`user_id`),
+    FOREIGN KEY(`vendor_id`) REFERENCES `vendor`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY(`customer_id`) REFERENCES `customer`(`user_id`),
     FOREIGN KEY(`event_id`) REFERENCES `event`(`event_id`),
     CONSTRAINT one_user_id CHECK ( -- ensure exactly one user id is attached to this ticket

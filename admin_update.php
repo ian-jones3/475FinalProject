@@ -96,7 +96,7 @@ $conn->close();
                 <td><input type="text" name="first_name" value="<?= htmlspecialchars($vendor["first_name"]) ?>" required></td>
                 <td><input type="text" name="last_name" value="<?= htmlspecialchars($vendor["last_name"]) ?>" required></td>
                 <td><input type="email" name="email" value="<?= htmlspecialchars($vendor["email"]) ?>" required></td>
-                <td><?= htmlspecialchars($vendor["last_managaed_by"]) ?></td>
+                <td><?= htmlspecialchars($vendor["last_managed_by"]) ?></td>
                 <td>
                     <input type="hidden" name="vendor_id" value="<?= $vendor["user_id"] ?>">
                     <button type="submit" name="update_vendor">Update</button>
